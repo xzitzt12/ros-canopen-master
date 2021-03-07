@@ -1,0 +1,7 @@
+uint8 nodeid
+uint16 index
+uint8 subindex
+int32 size
+uint32 data
+---
+int32 error
