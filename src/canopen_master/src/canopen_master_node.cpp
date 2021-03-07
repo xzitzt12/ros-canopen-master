@@ -70,9 +70,31 @@ int main(int argc, char **argv)
     sleep(5);
 
     printf("start\r\n");
-    masterSendNMTstateChange(canopen_master_od_data, 2, NMT_Reset_Node);
-    // sleep(1);
-    masterSendNMTstateChange(canopen_master_od_data, 2, NMT_Start_Node);
+
+    for (;;) {
+        UNS8 slave_state;
+
+        slave_state = masterRequestNodeState(canopen_master_od_data, 2);
+        switch (slave_state)
+        {
+        case Initialisation:
+            break;
+        case Pre_operational:
+            masterSendNMTstateChange(canopen_master_od_data, 2, NMT_Start_Node);
+            break;
+        case Operational:
+            break;
+        case Stopped:
+            masterSendNMTstateChange(canopen_master_od_data, 2, NMT_Start_Node);
+        default:
+            break;
+        }
+
+        if (slave_state == Operational) {
+            break;
+        }
+    }
+    
     // sleep(1);
     canopen_master_write(2, 0x6040, 0x00, 2, 0x01);
     // sleep(1);
